@@ -111,16 +111,19 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const checkAuth = (req, res, next) => {
-  const token = req.cookies.jwt;  // Get token from cookie
+export const checkAuth = async (req, res) => {
+  const token = req.cookies.jwt;
   if (!token) {
-    return res.status(401).send('No token provided');
+    return res.status(401).json({ message: 'No token provided' });
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id }; // Attach user info to request if needed
-    next();
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
   } catch (err) {
-    return res.status(401).send('Invalid token');
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };

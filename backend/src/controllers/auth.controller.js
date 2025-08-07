@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 import cloudinary from "../lib/cloudinary.js";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
   const { email, password, firstName = "", lastName = "" } = req.body;
@@ -111,14 +112,15 @@ export const updateProfile = async (req, res) => {
 };
 
 export const checkAuth = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; 
+  const token = req.cookies.jwt;  // Get token from cookie
   if (!token) {
     return res.status(401).send('No token provided');
   }
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
-    next(); 
-  } catch {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: decoded.id }; // Attach user info to request if needed
+    next();
+  } catch (err) {
     return res.status(401).send('Invalid token');
   }
 };

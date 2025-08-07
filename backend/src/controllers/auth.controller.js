@@ -110,7 +110,7 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-const checkAuth = (req, res, next) => {
+export const checkAuth = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]; 
   if (!token) {
     return res.status(401).send('No token provided');

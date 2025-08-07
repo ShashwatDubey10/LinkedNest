@@ -110,11 +110,15 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const checkAuth = (req, res) => {
+const checkAuth = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]; 
+  if (!token) {
+    return res.status(401).send('No token provided');
+  }
   try {
-    res.status(200).json(req.user);
-  } catch (error) {
-    console.log("Error in checkAuth controller", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    jwt.verify(token, process.env.JWT_SECRET);
+    next(); 
+  } catch {
+    return res.status(401).send('Invalid token');
   }
 };

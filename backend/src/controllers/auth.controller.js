@@ -1,3 +1,5 @@
+// src/controllers/auth.controller.js
+
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
@@ -7,13 +9,12 @@ import jwt from "jsonwebtoken";
 export const signup = async (req, res) => {
   const { email, password, firstName = "", lastName = "" } = req.body;
   try {
-    if (!email || !password || !firstName)
+    if (!email || !password || !firstName) {
       return res.status(400).json({ message: "Fill in all the fields" });
+    }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters" });
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const user = await User.findOne({ email });
@@ -43,7 +44,7 @@ export const signup = async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    console.log("Error in Register Controller", error.message);
+    console.error("Error in Register Controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -70,7 +71,7 @@ export const login = async (req, res) => {
       lastName: user.lastName,
     });
   } catch (error) {
-    console.log("Error in login controller", error.message);
+    console.error("Error in login controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -85,7 +86,7 @@ export const logout = (req, res) => {
     });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller", error.message);
+    console.error("Error in logout controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -93,7 +94,7 @@ export const logout = (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id; // Must be set by your protectRoute middleware
 
     if (!profilePic) {
       return res.status(400).json({ message: "Profile pic is required" });
@@ -103,10 +104,11 @@ export const updateProfile = async (req, res) => {
       userId,
       { profilePic: uploadResponse.secure_url },
       { new: true }
-    );
+    ).select('-password');
+
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.log("Error in update profile controller", error.message);
+    console.error("Error in update profile controller", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

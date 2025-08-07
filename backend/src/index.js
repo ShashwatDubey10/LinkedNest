@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-  origin: 'https://linkednest-nu.vercel.app/', 
+  origin: 'https://linkednest-nu.vercel.app', 
   credentials: true,               
 };
 

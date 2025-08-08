@@ -18,7 +18,7 @@ app.set('trust proxy', 1);
 
 // CORS middleware configuration to allow requests from your frontend and send cookies
 app.use(cors({
-  origin: ['https://linkednest-nu.vercel.app','http://localhost:5173'],  // Your frontend URL
+  origin: ['https://linkednest.onrender.com','http://localhost:5173'],  // Your frontend URL
   credentials: true,
 }));
 
